@@ -106,12 +106,30 @@ class _OrderScreenState extends State<OrderScreen> {
       noteForDisplay = _notesController.text;
     }
 
+    final double totalPrice = const PricingRepository().calculateTotal(
+      quantity: _quantity,
+      isFootlong: _isFootlong,
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
           'Sandwich Counter',
           style: heading1,
         ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: TextButton(
+              key: const Key('total_price_button'),
+              onPressed: () {},
+              child: Text(
+                '\$${totalPrice.toStringAsFixed(2)}',
+                style: normalText,
+              ),
+            ),
+          ),
+        ],
       ),
       body: Center(
         child: Column(

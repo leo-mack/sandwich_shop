@@ -21,3 +21,14 @@ class OrderRepository {
     }
   }
 }
+
+
+class PricingRepository {
+  const PricingRepository();
+
+  double calculateTotal({required int quantity, required bool isFootlong}) {
+    if (quantity <= 0) return 0.0;
+    final double unitPrice = isFootlong ? 11.0 : 7.0;
+    return unitPrice * quantity;
+  }
+}
