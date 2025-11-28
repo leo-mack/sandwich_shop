@@ -1559,7 +1559,7 @@ This week we have had a heavy worksheet so we will keep the exercises light. Com
 
    The goal of this exercise is to eliminate duplication, standardize the look of the app across all screens, and ideally add a more consistent navigation experience.
 
-   ⚠️ **Show your consistent appbar across all pages to a member of staff** for a sign-off.
+   ⚠️ **Describe your changes and show the app to a staff member** for a sign-off (e.g., show them the file(s) containing the common widgets and how you have used them across the app).
 
 2. (Advanced) Our database operations so far are only limited to creating a table, inserting and reading data. You are already familiar with SQL commands like `UPDATE` and `DELETE` from your previous database module.
 
