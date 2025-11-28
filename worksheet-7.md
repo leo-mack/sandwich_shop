@@ -879,47 +879,84 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 }
 ```
 
-Don't forget to update the profile screen to maintain consistency with the app bar design. This is a new page that we have added (it was one of the exercises from the previous worksheet). In `lib/views/profile_screen.dart`, add the provider import and update the app bar:
+Don't forget to update the profile screen to maintain consistency with the app bar design. This is a new page that we have added (it was one of the exercises from the previous worksheet). In `lib/views/profile_screen.dart`, add the provider import at the top of the file:
 
 ```dart
 import 'package:provider/provider.dart';
 import 'package:sandwich_shop/models/cart.dart';
 ```
 
-Then update the app bar in the build method:
+Then update the build method to add the cart indicator to the app bar while keeping the existing form functionality:
 
 ```dart
-appBar: AppBar(
-  leading: Padding(
-    padding: const EdgeInsets.all(8.0),
-    child: SizedBox(
-      height: 100,
-      child: Image.asset('assets/images/logo.png'),
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    appBar: AppBar(
+      leading: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: SizedBox(
+          height: 100,
+          child: Image.asset('assets/images/logo.png'),
+        ),
+      ),
+      title: const Text(
+        'Profile',
+        style: heading1,
+      ),
+      actions: [
+        Consumer<Cart>(
+          builder: (context, cart, child) {
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.shopping_cart),
+                  const SizedBox(width: 4),
+                  Text('${cart.countOfItems}'),
+                ],
+              ),
+            );
+          },
+        ),
+      ],
     ),
-  ),
-  title: const Text(
-    'Profile',
-    style: heading1,
-  ),
-  actions: [
-    Consumer<Cart>(
-      builder: (context, cart, child) {
-        return Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(Icons.shopping_cart),
-              const SizedBox(width: 4),
-              Text('${cart.countOfItems}'),
-            ],
+    body: Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const Text('Enter your details:', style: heading2),
+          const SizedBox(height: 20),
+          TextField(
+            controller: _nameController,
+            decoration: const InputDecoration(
+              labelText: 'Your Name',
+              border: OutlineInputBorder(),
+            ),
           ),
-        );
-      },
+          const SizedBox(height: 16),
+          TextField(
+            controller: _locationController,
+            decoration: const InputDecoration(
+              labelText: 'Preferred Location',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: _saveProfile,
+            child: const Text('Save Profile'),
+          ),
+        ],
+      ),
     ),
-  ],
-),
+  );
+}
 ```
+
+Note that we're only updating the app bar section - the rest of the profile screen (the text controllers, form fields, and save functionality) remains unchanged from the previous worksheet.
 
 Test your app to ensure the state management is working correctly. The cart should now be shared across all screens and automatically update when modified.
 
