@@ -558,7 +558,7 @@ Complete the exercises below. Remember to commit your changes after each exercis
 
     As always, update your widget tests to cover the new navigation drawer (or generally, navigation) functionality.
 
-    ⚠️ **Show your `requirements.md`, working navigation and associated test(s) to a member of staff** for a sign-off.
+    ⚠️ **Show the updates to `requirements.md`, working navigation and associated test(s) to a member of staff** for a sign-off.
 
 3. (Advanced) Configure your app to handle [deep links](https://docs.flutter.dev/ui/navigation/deep-linking) using `go_router`, which is the recommended approach for URL-based navigation in Flutter.
 
