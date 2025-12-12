@@ -58,6 +58,11 @@ class Cart {
     }
   }
 
+  /// Alias for addSandwich for convenience.
+  void add(Sandwich sandwich, {int quantity = 1}) {
+    addSandwich(sandwich, quantity);
+  }
+
   /// Update quantity of an item at the given index.
   void updateQuantity(int index, int quantity) {
     if (index < 0 || index >= _items.length) return;
