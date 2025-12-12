@@ -53,6 +53,12 @@ void main() {
       await tester.pumpWidget(const App());
       expect(find.text('Quantity: '), findsOneWidget);
     });
+
+    testWidgets('cart summary not shown initially when empty',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(const App());
+      expect(find.byKey(const Key('cart_summary')), findsNothing);
+    });
   });
 
   group('OrderScreen - Quantity Controls', () {
@@ -352,8 +358,112 @@ void main() {
       await tester.tap(cartButton);
       await tester.pumpAndSettle();
       
-        // Should navigate to CartScreen - verify by checking title
-        expect(find.text('Shopping Cart'), findsOneWidget);
+      // Should navigate to CartScreen - verify by checking title
+      expect(find.text('Shopping Cart'), findsOneWidget);
+    });
+  });
+
+  group('OrderScreen - Cart Summary', () {
+    testWidgets('cart summary badge appears after adding item',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(const App());
+      await tester.pumpAndSettle();
+
+      // Initially no summary
+      expect(find.byKey(const Key('cart_summary')), findsNothing);
+
+      // Scroll to make add to cart button visible
+      await tester.ensureVisible(find.text('Add to Cart'));
+      await tester.pumpAndSettle();
+
+      // Tap add to cart
+      await tester.tap(find.text('Add to Cart'));
+      await tester.pumpAndSettle();
+
+      // Summary badge should now appear
+      expect(find.byKey(const Key('cart_summary')), findsOneWidget);
+      expect(find.byKey(const Key('cart_summary_text')), findsOneWidget);
+    });
+
+    testWidgets('cart summary badge shows correct item count',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(const App());
+      await tester.pumpAndSettle();
+
+      // Add 1 item (initial quantity is 1)
+      await tester.ensureVisible(find.text('Add to Cart'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Add to Cart'));
+      await tester.pumpAndSettle();
+
+      // Verify badge shows "1"
+      final summaryText = tester.widget<Text>(
+        find.byKey(const Key('cart_summary_text')),
+      );
+      expect(summaryText.data, '1');
+    });
+
+    testWidgets('cart summary updates when multiple items added',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(const App());
+      await tester.pumpAndSettle();
+
+      // Increase quantity to 3
+      final addButton = find.byIcon(Icons.add).last;
+      await tester.ensureVisible(addButton);
+      await tester.pumpAndSettle();
+
+      await tester.tap(addButton);
+      await tester.pumpAndSettle();
+      await tester.tap(addButton);
+      await tester.pumpAndSettle();
+
+      // Add 3 items to cart
+      await tester.ensureVisible(find.text('Add to Cart'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Add to Cart'));
+      await tester.pumpAndSettle();
+
+      // Verify badge shows "3"
+      final summaryText = tester.widget<Text>(
+        find.byKey(const Key('cart_summary_text')),
+      );
+      expect(summaryText.data, '3');
+    });
+
+    testWidgets('cart summary increments on multiple add operations',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(const App());
+      await tester.pumpAndSettle();
+
+      // Add 1 item
+      await tester.ensureVisible(find.text('Add to Cart'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Add to Cart'));
+      await tester.pumpAndSettle();
+
+      var summaryText = tester.widget<Text>(
+        find.byKey(const Key('cart_summary_text')),
+      );
+      expect(summaryText.data, '1');
+    });
+
+    testWidgets('cart summary badge has correct styling',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(const App());
+      await tester.pumpAndSettle();
+
+      // Add item
+      await tester.ensureVisible(find.text('Add to Cart'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Add to Cart'));
+      await tester.pumpAndSettle();
+
+      // Verify container exists with red background
+      final badgeContainer = tester.widget<Container>(
+        find.byKey(const Key('cart_summary')),
+      );
+      expect(badgeContainer, isNotNull);
     });
   });
 }

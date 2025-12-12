@@ -198,13 +198,39 @@ class _OrderScreenState extends State<OrderScreen> {
         actions: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: TextButton(
-              key: const Key('cart_button'),
-              onPressed: _openCart,
-              child: const Text(
-                '🛒',
-                style: TextStyle(fontSize: 24),
-              ),
+            child: Stack(
+              children: [
+                TextButton(
+                  key: const Key('cart_button'),
+                  onPressed: _openCart,
+                  child: const Text(
+                    '🛒',
+                    style: TextStyle(fontSize: 24),
+                  ),
+                ),
+                if (_cart.totalQuantity > 0)
+                  Positioned(
+                    right: 0,
+                    top: 0,
+                    child: Container(
+                      key: const Key('cart_summary'),
+                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        '${_cart.totalQuantity}',
+                        key: const Key('cart_summary_text'),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
             ),
           ),
         ],
