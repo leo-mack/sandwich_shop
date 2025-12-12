@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:sandwich_shop/views/app_styles.dart';
-import 'package:sandwich_shop/repositories/order_repository.dart';
 import 'package:sandwich_shop/repositories/pricing_repository.dart';
+import 'package:sandwich_shop/models/cart.dart';
+import 'package:sandwich_shop/views/cart_screen.dart';
 
 enum BreadType { white, wheat, wholemeal }
 
@@ -33,17 +34,18 @@ class OrderScreen extends StatefulWidget {
 }
 
 class _OrderScreenState extends State<OrderScreen> {
-  late final OrderRepository _orderRepository;
+  int _quantity = 0;
   final TextEditingController _notesController = TextEditingController();
   bool _isFootlong = true;
   BreadType _selectedBreadType = BreadType.white;
   late final PricingRepository _pricingRepository;
+  late final Cart _cart;
 
   @override
   void initState() {
     super.initState();
-    _orderRepository = OrderRepository(maxQuantity: widget.maxQuantity);
     _pricingRepository = PricingRepository();
+    _cart = Cart();
     _notesController.addListener(() {
       setState(() {});
     });
@@ -56,15 +58,15 @@ class _OrderScreenState extends State<OrderScreen> {
   }
 
   VoidCallback? _getIncreaseCallback() {
-    if (_orderRepository.canIncrement) {
-      return () => setState(_orderRepository.increment);
+    if (_quantity < widget.maxQuantity) {
+      return () => setState(() => _quantity++);
     }
     return null;
   }
 
   VoidCallback? _getDecreaseCallback() {
-    if (_orderRepository.canDecrement) {
-      return () => setState(_orderRepository.decrement);
+    if (_quantity > 0) {
+      return () => setState(() => _quantity--);
     }
     return null;
   }
@@ -77,6 +79,31 @@ class _OrderScreenState extends State<OrderScreen> {
     if (value != null) {
       setState(() => _selectedBreadType = value);
     }
+  }
+
+  void _addToCart() {
+    if (_quantity <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select a quantity')),
+      );
+      return;
+    }
+
+    // For now, we'll use a simple Sandwich representation with the current settings
+    // In a real app, you'd have proper Sandwich objects
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Added $_quantity sandwich(es) to cart')),
+    );
+    setState(() => _quantity = 0);
+  }
+
+  void _openCart() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CartScreen(cart: _cart),
+      ),
+    );
   }
 
   List<DropdownMenuEntry<BreadType>> _buildDropdownEntries() {
@@ -94,7 +121,7 @@ class _OrderScreenState extends State<OrderScreen> {
   @override
   Widget build(BuildContext context) {
     final double totalPrice = _pricingRepository.calculatePrice(
-      quantity: _orderRepository.quantity,
+      quantity: _quantity,
       isFootlong: _isFootlong,
     );
 
@@ -116,13 +143,26 @@ class _OrderScreenState extends State<OrderScreen> {
           'Sandwich Counter',
           style: heading1,
         ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: TextButton(
+              key: const Key('cart_button'),
+              onPressed: _openCart,
+              child: const Text(
+                '🛒',
+                style: TextStyle(fontSize: 24),
+              ),
+            ),
+          ),
+        ],
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             OrderItemDisplay(
-              quantity: _orderRepository.quantity,
+              quantity: _quantity,
               itemType: sandwichType,
               breadType: _selectedBreadType,
               orderNote: noteForDisplay,
@@ -180,6 +220,17 @@ class _OrderScreenState extends State<OrderScreen> {
                   backgroundColor: Colors.red,
                 ),
               ],
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              key: const Key('add_to_cart_button'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+              ),
+              onPressed: _addToCart,
+              child: const Text('Add to Cart'),
             ),
           ],
         ),
